@@ -21,11 +21,16 @@ const (
 	VAL_32_BITS   Val = C.VAL_32_BITS
 )
 
+type Buffer C.buffer
+type Field C.field
+
+type Kind struct {
+	Zero int
+}
+
 type Value struct {
 	Type Val
 }
-
-type Field C.field
 
 type ObjCell struct {
 	Id  Field
@@ -37,7 +42,6 @@ type ObjTable struct {
 	Cells []ObjCell
 }
 
-type Buffer C.buffer
 type TFloat C.tfloat
 
 type Float struct {
@@ -50,3 +54,46 @@ type Int32 struct {
 	Int  int
 }
 
+type Object struct {
+	Type  Val
+	Table ObjTable
+	Proto *Object
+}
+
+type Function struct {
+	Type   Val
+	NArgs  int
+	Addr   interface{}
+	Env    *Value
+	Module interface{}
+}
+
+type String struct {
+	Type Val
+	C    int8
+}
+
+type Array struct {
+	Type Val
+	Ptr  *Value
+}
+
+type Abstract struct {
+	Type Val
+	Kind *Kind
+	Data interface{}
+}
+
+type HCell struct {
+	HKey     int
+	Key, Val *Value
+	Next     *HCell
+}
+
+type Hash struct {
+	Cells          *[]HCell
+	NCells, NItems int
+}
+
+type MTLocal C.mt_local
+type MTLock C.mt_lock

@@ -1,7 +1,10 @@
 package neko
 
+// #include <malloc.h>
 // #include "neko/neko_vm.h"
 import "C"
+
+import "unsafe"
 
 type VM struct {
 	vm *C.neko_vm
@@ -20,6 +23,7 @@ func GlobalInit() {
 }
 
 func GlobalFree() {
+	C.neko_vm_select(nil)
 	C.neko_global_free()
 }
 
@@ -42,11 +46,13 @@ func GcStats() (heap, free int) {
 /// TODO param "void *" pparam
 /// TODO param "void **" handle
 /// TODO return "int"
-func ThreadCreate() {}
+func ThreadCreate() {
+}
 
 /// TODO param  neko "thread_main_func" f
 /// TODO param "void *" p
-func ThreadBlocking() {}
+func ThreadBlocking() {
+}
 
 func ThreadRegister(t bool) bool {
 	return C.neko_thread_register(C.bool(bool_to_int(t))) == 1
@@ -64,23 +70,28 @@ func CurrentVM() *VM {
 	return &VM{C.neko_vm_current()}
 }
 
-/// TODO return neko "value"
-func (vm *VM) ExecStack() {}
+func (vm *VM) ExecStack() Value {
+	return inlineCvalToValue(C.neko_exc_stack(vm.vm))
+}
 
-/// TODO return neko "value"
-func (vm *VM) CallStack() {}
+func (vm *VM) CallStack() Value {
+	return inlineCvalToValue(C.neko_call_stack(vm.vm))
+}
 
-/// TODO param neko "vkind" k
-/// TODO return "void *"
-func (vm *VM) Custom() {}
+/// FIXME
+func (vm *VM) Custom(k Kind) interface{} {
+	return nil
+	//return C.neko_vm_custom(vm.vm, *(*C.vkind)(unsafe.Pointer(&k)))
+}
 
-/// TODO param neko "vkind" k
-/// TODO param "void *" v
-func (vm *VM) SetCustom() {}
+/// FIXME
+func (vm *VM) SetCustom(k Kind, v interface{}) {
+	//C.neko_vm_set_custom(vm.vm, *(*C.vkind)(unsafe.Pointer(&k)), unsafe.Pointer(&v))
+}
 
-/// TODO param "void *" module
-/// TODO return neko "value"
-func (vm *VM) Execute() {}
+func (vm *VM) Execute(module interface{}) Value {
+	return inlineCvalToValue(C.neko_vm_execute(vm.vm, unsafe.Pointer(&module)))
+}
 
 func (vm *VM) Select() {
 	C.neko_vm_select(vm.vm)
@@ -96,18 +107,26 @@ func (vm *VM) Trusted(trusted bool) int {
 
 /// TODO param "neko_printer" print
 /// TODO param "void *" param
-func (vm *VM) Redirect() {}
+func (vm *VM) Redirect() {
+}
 
 /// TODO param "neko_stat_func" fstats
 /// TODO param "neko_stat_func" pstats
-func (vm *VM) SetStats() {}
+func (vm *VM) SetStats() {
+}
 
 func (vm *VM) DebugStack() {
 	C.neko_vm_dump_stack(vm.vm)
 }
 
-/// TODO return neko "value"
-func DefaultLoader(argv []string) {
+func DefaultLoader(argv []string) Value {
+	strs := make([]*C.char, len(argv))
+	for i, s := range argv {
+		strs[i] = C.CString(s)
+		defer C.free(unsafe.Pointer(strs[i]))
+	}
+
+	return inlineCvalToValue(C.neko_default_loader((**C.char)(unsafe.Pointer(&strs[0])), C.int(len(argv))))
 }
 
 func IsBigEndian() bool {
