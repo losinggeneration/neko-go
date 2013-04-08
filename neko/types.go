@@ -97,3 +97,6 @@ type Hash struct {
 
 type MTLocal C.mt_local
 type MTLock C.mt_lock
+
+type Printer func(string, interface{})
+

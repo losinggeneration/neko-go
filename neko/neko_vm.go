@@ -1,6 +1,7 @@
 package neko
 
 // #include <malloc.h>
+// #include "redirect.h"
 // #include "neko/neko_vm.h"
 import "C"
 
@@ -105,9 +106,9 @@ func (vm *VM) Trusted(trusted bool) int {
 	return int(C.neko_vm_trusted(vm.vm, C.int(bool_to_int(trusted))))
 }
 
-/// TODO param "neko_printer" print
-/// TODO param "void *" param
-func (vm *VM) Redirect() {
+func (vm *VM) Redirect(printer Printer, param interface{}) {
+	redirectFunc = printer
+	C.setRedirectFunc(vm.vm, unsafe.Pointer(&param))
 }
 
 /// TODO param "neko_stat_func" fstats
