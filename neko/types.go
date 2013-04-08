@@ -28,9 +28,11 @@ type Kind struct {
 	Zero int
 }
 
-type Value struct {
+type value struct {
 	Type Val
 }
+
+type Value *value
 
 type ObjCell struct {
 	Id  Field
@@ -99,4 +101,3 @@ type MTLocal C.mt_local
 type MTLock C.mt_lock
 
 type Printer func(string, interface{})
-

@@ -8,11 +8,11 @@ import "C"
 import "unsafe"
 
 func inlineValueToCval(v Value) C.value {
-	return *(*C.value)(unsafe.Pointer(&v))
+	return C.value(unsafe.Pointer(v))
 }
 
 func inlineCvalToValue(v C.value) Value {
-	return *(*Value)(unsafe.Pointer(&v))
+	return Value(unsafe.Pointer(v))
 }
 
 func AllocFloat(t TFloat) Value {
