@@ -1,6 +1,5 @@
 package neko
 
-// #include "redirect.h"
 import "C"
 
 var redirectFunc Printer
