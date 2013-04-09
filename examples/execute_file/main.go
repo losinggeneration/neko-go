@@ -20,12 +20,12 @@ func main() {
 	}
 
 	neko.GlobalInit()
-	vm,err := neko.NewVM()
+	vm, err := neko.NewVM()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
-	
+
 	vm.Select()
 	vm.Jit(true)
 	mload := neko.DefaultLoader(args)
