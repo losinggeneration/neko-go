@@ -3,6 +3,8 @@ package neko
 // #include "neko/neko.h"
 import "C"
 
+type Error error
+
 type Val C.val_type
 
 const (

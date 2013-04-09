@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/losinggeneration/neko-go/neko"
+	"os"
 )
 
 func load_file(mload neko.Value) {
@@ -19,7 +20,12 @@ func main() {
 	}
 
 	neko.GlobalInit()
-	vm := neko.NewVM()
+	vm,err := neko.NewVM()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return
+	}
+	
 	vm.Select()
 	vm.Jit(true)
 	mload := neko.DefaultLoader(args)

@@ -5,7 +5,10 @@ package neko
 // #include "neko/neko_vm.h"
 import "C"
 
-import "unsafe"
+import (
+	"fmt"
+	"unsafe"
+)
 
 type VM struct {
 	vm *C.neko_vm
@@ -59,16 +62,26 @@ func ThreadRegister(t bool) bool {
 	return C.neko_thread_register(C.bool(bool_to_int(t))) == 1
 }
 
-func NewVM() *VM {
-	return &VM{vmAlloc()}
+func NewVM() (*VM, Error) {
+	vm := vmAlloc()
+	if vm == nil {
+		return nil, fmt.Errorf("Unable to allocate VM")
+	}
+
+	return &VM{vm}, nil
 }
 
 func vmAlloc() *C.neko_vm {
 	return C.neko_vm_alloc(nil)
 }
 
-func CurrentVM() *VM {
-	return &VM{C.neko_vm_current()}
+func CurrentVM() (*VM, Error) {
+	vm := C.neko_vm_current()
+	if vm == nil {
+		return nil, fmt.Errorf("Unable to get current VM")
+	}
+
+	return &VM{vm}, nil
 }
 
 func (vm *VM) ExecStack() Value {
