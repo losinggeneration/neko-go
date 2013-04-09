@@ -140,7 +140,13 @@ func DefaultLoader(argv []string) Value {
 		defer C.free(unsafe.Pointer(strs[i]))
 	}
 
-	return inlineCvalToValue(C.neko_default_loader((**C.char)(unsafe.Pointer(&strs[0])), C.int(len(argv))))
+	// Respect passing nil as a valid argument
+	var cargv **C.char
+	if len(argv) != 0 {
+		cargv = (**C.char)(unsafe.Pointer(&strs[0]))
+	}
+
+	return inlineCvalToValue(C.neko_default_loader(cargv, C.int(len(argv))))
 }
 
 func IsBigEndian() bool {
