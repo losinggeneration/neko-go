@@ -14,12 +14,14 @@ type VM struct {
 	vm *C.neko_vm
 }
 
-func bool_to_int(b bool) int {
-	if b {
-		return 1
-	}
+var gobool = map[bool] C.bool {
+	false: C.false,
+	true: C.true,
+}
 
-	return 0
+var gointbool = map[bool] C.int {
+	false: 0,
+	true: 1,
 }
 
 func GlobalInit() {
@@ -59,7 +61,7 @@ func ThreadBlocking() {
 }
 
 func ThreadRegister(t bool) bool {
-	return C.neko_thread_register(C.bool(bool_to_int(t))) == 1
+	return C.neko_thread_register(gobool[t]) == 1
 }
 
 func NewVM() (*VM, Error) {
@@ -112,11 +114,11 @@ func (vm *VM) Select() {
 }
 
 func (vm *VM) Jit(enable bool) int {
-	return int(C.neko_vm_jit(vm.vm, C.int(bool_to_int(enable))))
+	return int(C.neko_vm_jit(vm.vm, gointbool[enable]))
 }
 
 func (vm *VM) Trusted(trusted bool) int {
-	return int(C.neko_vm_trusted(vm.vm, C.int(bool_to_int(trusted))))
+	return int(C.neko_vm_trusted(vm.vm, gointbool[trusted]))
 }
 
 func (vm *VM) Redirect(printer Printer, param interface{}) {
